@@ -47,7 +47,7 @@ async function fetchProducts() {
                     <h3 style="margin-bottom: auto;">${p.name}</h3>
                 </div>
                 <div class="price">₡${p.price.toLocaleString()}</div>
-                <button class="btn-add add-to-cart btn-cart-handler" ${isOutOfStock ? 'disabled' : ''}>
+                <button class="btn-add add-to-cart btn-cart-handler" data-id="${p.sku}" data-name="${p.name}" data-price="${p.price}" ${isOutOfStock ? 'disabled' : ''}>
                     ${isOutOfStock ? 'Agotado' : 'Añadir <span class="material-symbols-outlined" style="font-size:18px;">add_shopping_cart</span>'}
                 </button>
             `;

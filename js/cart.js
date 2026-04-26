@@ -157,11 +157,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const addToCartBtns = document.querySelectorAll('.add-to-cart');
     addToCartBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
+            const target = e.currentTarget;
             const product = {
-                id: e.target.getAttribute('data-id'),
-                name: e.target.getAttribute('data-name'),
-                price: parseFloat(e.target.getAttribute('data-price'))
+                id: target.getAttribute('data-id'),
+                name: target.getAttribute('data-name'),
+                price: parseFloat(target.getAttribute('data-price'))
             };
+            if (!product.id || !product.price) {
+                console.error('Missing product data:', product);
+                return;
+            }
             addToCart(product);
         });
     });
