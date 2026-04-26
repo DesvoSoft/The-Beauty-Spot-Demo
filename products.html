@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Beauty Spot</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff69b4'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>">
+    <meta name="description" content="Productos de cuidado personal premium. Estila y embellece tu piel. Envíos a todo Costa Rica.">
+    <meta property="og:title" content="The Beauty Spot">
+    <meta property="og:description" content="Cosméticos y Skincare exclusivos, sin complicaciones.">
+    <!-- SEO / Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Store",
+      "name": "The Beauty Spot",
+      "image": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=600&auto=format&fit=crop",
+      "priceRange": "₡",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "CR"
+      }
+    }
+    </script>
+    <!-- CSS & Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="css/index.css">
+    <!-- Scripts -->
+    <script src="js/products-data.js"></script>
+    <script src="js/landing.js" defer></script>
+    <script src="js/cart.js" defer></script>
+</head>
+<body>
+    <!-- Capa de partículas fixed -->
+    <div id="particles-layer"></div>
+
+    <!-- Header Fixed con Backdrop Blur -->
+    <header>
+        <div class="logo-container">
+            <a href="index.html" style="text-decoration: none;">
+                <span class="logo-text"><span class="the">The</span> <span class="beauty">Beauty</span> <span class="spot">Spot</span></span>
+            </a>
+        </div>
+        <div class="header-actions">
+            <button id="theme-toggle-btn" class="theme-toggle" aria-label="Cambiar tema" role="switch" aria-checked="false">
+                <span class="material-symbols-outlined">light_mode</span>
+            </button>
+            <a href="checkout.html" class="cart-icon" aria-label="Ir al carrito" role="button" tabindex="0">
+                <span class="material-symbols-outlined">shopping_bag</span>
+                <span class="cart-count" id="global-cart-count" aria-live="polite">0</span>
+            </a>
+        </div>
+    </header>
+    <div class="content-wrapper" style="padding-top: 120px;">
+        <!-- Collection -->
+        <div class="top-products-container">
+            <h2 style="text-align:center; font-family:'Pacifico', cursive; color:var(--color-main); font-size: 3rem; margin-bottom: 30px;">Colección Completa</h2>
+            <section class="products-grid" id="products-section">
+                <!-- Cards generadas por JS -->
+            </section>
+        </div>
+    </div>
+
+    <!-- Instagram Section -->
+    <section class="instagram-section">
+        <div class="glass-panel instagram-content">
+            <h2 class="section-title" style="text-align:center;">¡Visítanos en Instagram!</h2>
+            <p style="text-align:center;">Síguenos para estar al tanto de nuevos productos, promociones y más.</p>
+            <a href="https://www.instagram.com/thebeautyspot.cr/" target="_blank" class="instagram-cta">
+                <img src="assets/instagram-logo.png" alt="Instagram">
+                <span>@thebeautyspot.cr</span>
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; Derechos reservados The Beauty Spot 2026</p>
+        <p style="margin-top: 5px; font-size: 0.85em; opacity: 0.8;">Desarrollado por <a href="https://github.com/DesvoSoft" target="_blank" class="dev-link">DesvoSoft</a> <img src="assets/cr.png" alt="Costa Rica" style="width: 18px; vertical-align: middle; margin-left: 4px; border-radius: 2px;"></p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Producto | The Beauty Spot</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff69b4'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="css/index.css">
+    <script src="js/products-data.js"></script>
+    <script src="js/cart.js" defer></script>
+    <style>
+        .product-detail-wrapper {
+            max-width: 1200px; margin: 40px auto; padding: 0 20px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+        }
+        .product-image {
+            width: 100%; border-radius: 25px; object-fit: cover;
+            box-shadow: 0 15px 30px var(--shadow-color);
+            transition: transform 0.3s;
+        }
+        .product-image:hover { transform: scale(1.02); }
+        .product-info h1 {
+            font-size: 3rem; color: var(--primary-magenta); margin-bottom: 10px;
+        }
+        .product-price {
+            font-size: 2rem; font-weight: bold; color: var(--vibrant-pink); margin-bottom: 20px;
+        }
+        .product-section {
+            background: var(--glass-bg); padding: 20px; border-radius: 15px;
+            margin-bottom: 20px; border: 1px solid var(--glass-border);
+        }
+        .product-section h3 { color: var(--color-secondary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;}
+        .product-section ul { margin-left: 20px; line-height: 1.6; }
+        
+        .reviews-container { margin-top: 40px; }
+        .review-card {
+            background: var(--glass-bg); padding: 15px; border-radius: 15px;
+            margin-bottom: 15px; border: 1px solid var(--glass-border);
+        }
+        .review-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold; color: var(--primary-magenta); }
+        .stars { color: #FFD700; }
+        
+        @media (max-width: 768px) {
+            .product-detail-wrapper { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo-container" style="text-decoration: none;">
+            <span class="the">The</span> 
+            <span class="beauty">Beauty</span> 
+            <span class="spot">Spot</span>
+        </a>
+        <div class="header-actions">
+            <button id="theme-toggle-btn" class="theme-toggle" aria-label="Cambiar tema" role="switch" aria-checked="false">
+                <span class="material-symbols-outlined">light_mode</span>
+            </button>
+            <a href="checkout.html" class="cart-icon" aria-label="Ir al carrito" role="button" tabindex="0">
+                <span class="material-symbols-outlined">shopping_bag</span>
+                <span class="cart-count" id="global-cart-count" aria-live="polite">0</span>
+            </a>
+        </div>
+    </header>
+
+    <div class="content-wrapper">
+        <div id="product-content">
+            <!-- Cargando Producto... -->
+            <div style="text-align: center; padding: 100px;">
+                <div class="spinner-heart"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 3rem;">favorite</span></div>
+                <p style="margin-top:20px; color: var(--primary-magenta)">Cargando...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script to fetch product -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const productId = params.get('id');
+
+            if (!productId) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                // Find product from shared data
+                const product = PRODUCTS_DATA.find(p => p.sku === productId);
+                
+                if (!product) {
+                    throw new Error('Producto no encontrado');
+                }
+                
+                document.title = `${product.name} | The Beauty Spot`;
+                renderProduct(product);
+                injectSchema(product);
+            } catch (err) {
+                document.getElementById('product-content').innerHTML = `
+                    <div style="text-align:center; padding:100px;">
+                        <h2>Producto no encontrado</h2>
+                        <a href="index.html" class="btn-primary" style="display:inline-block; margin-top:20px; text-decoration:none;">Volver a la tienda</a>
+                    </div>
+                `;
+            }
+        });
+
+        function renderProduct(p) {
+            const ingredientsHtml = p.ingredients && p.ingredients.length > 0 
+                ? p.ingredients.map(i => `<li><span class="material-symbols-outlined" style="font-size: 14px;">auto_awesome</span> ${i}</li>`).join('')
+                : '<li><span class="material-symbols-outlined" style="font-size: 14px;">auto_awesome</span> Fórmula secreta magistral</li>';
+                
+            const reviewsHtml = p.reviews && p.reviews.length > 0
+                ? p.reviews.map(r => {
+                    const stars = `<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; color: #FFD700; font-size: 18px;">star</span>`.repeat(r.rating) + 
+                                  `<span class="material-symbols-outlined" style="color: #FFD700; font-size: 18px;">star</span>`.repeat(5-r.rating);
+                    return `
+                    <div class="review-card glass-panel">
+                        <div class="review-header">
+                            <span style="display:flex; align-items:center; gap:4px;"><span class="material-symbols-outlined" style="font-size: 18px;">person</span> ${r.user}</span>
+                            <span class="stars" style="display:flex;">${stars}</span>
+                        </div>
+                        <p>"${r.comment || '¡Me encanta!'}"</p>
+                    </div>
+                `}).join('')
+                : '<p>Sé la primera en dejar una reseña</p>';
+
+            const html = `
+                <div class="product-detail-wrapper">
+                    <div>
+                        <img src="${p.imageUrl}" alt="${p.name}" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <h1>${p.name}</h1>
+                        <div class="product-price">₡${p.price.toLocaleString()}</div>
+                        <p style="font-size:1.1rem; margin-bottom: 25px; line-height: 1.6;">${p.description}</p>
+                        
+                        <button id="add-to-cart-btn" class="btn-primary add-to-cart" style="width:100%; margin-bottom: 30px; display:flex; justify-content:center; align-items:center; gap:8px;" 
+                                data-id="${p.sku}" data-name="${p.name}" data-price="${p.price}">
+                            Añadir al Carrito <span class="material-symbols-outlined">add_shopping_cart</span>
+                        </button>
+
+                        <div class="product-section">
+                            <h3>Cómo usar</h3>
+                            <p>${p.howToUse || 'Aplicar sobre la piel limpia con suaves masajes.'}</p>
+                        </div>
+                        
+                        <div class="product-section">
+                            <h3>Ingredientes Clave</h3>
+                            <ul style="list-style:none; margin:0;">${ingredientsHtml}</ul>
+                        </div>
+                        
+                        <div class="reviews-container">
+                            <h3 style="color: var(--primary-magenta); margin-bottom: 15px;">Reseñas</h3>
+                            ${reviewsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('product-content').innerHTML = html;
+            
+            const btn = document.getElementById('add-to-cart-btn');
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    handleAddToCart(p.sku, p.name, p.price);
+                });
+            }
+        }
+
+        function handleAddToCart(id, name, price) {
+            if (typeof addToCart === 'function') {
+                addToCart({ id, name, price });
+                trackAddToCart(id);
+            }
+        }
+
+
+        function injectSchema(p) {
+            const schema = {
+                "@context": "https://schema.org/",
+                "@type": "Product",
+                "name": p.name,
+                "image": p.imageUrl,
+                "description": p.description,
+                "sku": p.sku,
+                "offers": {
+                    "@type": "Offer",
+                    "url": window.location.href,
+                    "priceCurrency": "CRC",
+                    "price": p.price,
+                    "availability": "https://schema.org/InStock"
+                }
+            };
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.text = JSON.stringify(schema);
+            document.head.appendChild(script);
+        }
+    </script>
+    <!-- Instagram Section -->
+    <section class="instagram-section">
+        <div class="glass-panel instagram-content">
+            <h2 class="section-title">¡Visítanos en Instagram!</h2>
+            <p>Síguenos para estar al tanto de nuevos productos, promociones y más.</p>
+            <a href="https://www.instagram.com/thebeautyspot.cr/" target="_blank" class="instagram-cta">
+                <img src="assets/instagram-logo.png" alt="Instagram">
+                <span>@thebeautyspot.cr</span>
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; Derechos reservados The Beauty Spot 2026</p>
+        <p style="margin-top: 5px; font-size: 0.85em; opacity: 0.8;">Desarrollado por <a href="https://github.com/DesvoSoft" target="_blank" class="dev-link">DesvoSoft</a> <img src="assets/cr.png" alt="Costa Rica" style="width: 18px; vertical-align: middle; margin-left: 4px; border-radius: 2px;"></p>
+    </footer>
+</body>
+</html>

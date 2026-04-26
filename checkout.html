@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | The Beauty Spot</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff69b4'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="css/index.css">
+    <script src="js/cart.js" defer></script>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo-container">
+            <a href="index.html" style="text-decoration: none;">
+                <span class="logo-text"><span class="the">The</span> <span class="beauty">Beauty</span> <span class="spot">Spot</span></span>
+            </a>
+        </div>
+        <div class="header-actions">
+            <button id="theme-toggle-btn" class="theme-toggle" aria-label="Cambiar tema" role="switch" aria-checked="false">
+                <span class="material-symbols-outlined">light_mode</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="checkout-main" style="position:relative;">
+        <!-- Estrellas flotantes -->
+        <span class="material-symbols-outlined floating-star" style="top: 10%; left: 5%; font-size: 2rem;">auto_awesome</span>
+        <span class="material-symbols-outlined floating-star" style="top: 50%; right: 2%; font-size: 3rem; animation-delay: 1s;">auto_awesome</span>
+        <span class="material-symbols-outlined floating-star" style="bottom: 10%; left: 15%; font-size: 1.5rem; animation-delay: 2s;">auto_awesome</span>
+        
+        <div class="checkout-grid">
+            <!-- Left: Form -->
+            <div class="glass-panel checkout-form-container">
+                <h2 class="checkout-title" style="margin-bottom: 50px;">Completa tu orden</h2>
+                
+                <form id="checkout-form">
+                    <div class="form-section">
+                        <h3 class="form-section-title">Informacion de contacto</h3>
+                        <div class="form-group">
+                            <label for="email">Correo Electronico</label>
+                            <input type="email" id="email" name="email" class="form-control" required placeholder="tu@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Telefono (WhatsApp)</label>
+                            <input type="tel" id="phone" name="phone" class="form-control" required placeholder="88888888">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title">Direccion de envio</h3>
+                        <div class="form-group">
+                            <label for="name">Nombre completo</label>
+                            <input type="text" id="name" name="name" class="form-control" required placeholder="Tu nombre">
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Direccion</label>
+                            <textarea id="address" name="address" class="form-control" rows="3" required placeholder="Provincia, Canton, Distrito,Detalles exactos"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section" style="margin-top: 50px;">
+                        <h3 class="form-section-title" style="margin-bottom: 25px;">Metodo de envio</h3>
+                        <div class="form-group">
+                            <select id="shipping" name="shipping" class="form-control">
+                                <option value="correos">Correos de CR (+₡2,500)</option>
+                                <option value="mensajeria">Mensajeria Privada GAM (+₡3,500)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary checkout-btn" style="margin-top: 40px; padding: 20px;">
+                        Confirmar Orden via WhatsApp
+                        <img src="assets/WhatsApp Logo.png" alt="WhatsApp" style="width: 28px; height: 28px;">
+                    </button>
+                    <p class="checkout-note" style="margin-top: 20px;">Al confirmar, generaremos tu orden y seras redirigida a WhatsApp para enviar el comprobante SINPE.</p>
+                </form>
+            </div>
+
+            <!-- Right: Order Summary -->
+            <div class="glass-panel glass-pink checkout-summary">
+                <h2 class="checkout-title">Resumen</h2>
+                <div id="checkout-cart-container" class="checkout-items">
+                    <!-- Cart items rendered here -->
+                </div>
+                
+                <div class="checkout-totals">
+                    <div class="total-row">
+                        <span>Subtotal</span>
+                        <span id="checkout-subtotal">₡0</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Envio</span>
+                        <span id="checkout-shipping">₡2,500</span>
+                    </div>
+                    <div class="total-row total-final">
+                        <span>Total</span>
+                        <span id="checkout-total">₡0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Global Loader -->
+    <div class="loader-overlay" id="global-loader">
+        <div class="spinner-heart"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 3rem;">favorite</span></div>
+    </div>
+
+    <script>
+        function renderCheckout() {
+            const container = document.getElementById('checkout-cart-container');
+            const cartHtml = renderCartHtml();
+            container.innerHTML = cartHtml;
+            updateCartTotal();
+        }
+
+        function updateCartTotal() {
+            const shippingMethod = document.getElementById('shipping').value;
+            const shippingCost = shippingMethod === 'mensajeria' ? 3500 : 2500;
+            const cartItems = getCartItems();
+            const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            const total = subtotal + shippingCost;
+            
+            document.getElementById('checkout-subtotal').innerText = '₡' + subtotal.toLocaleString();
+            document.getElementById('checkout-shipping').innerText = '₡' + shippingCost.toLocaleString();
+            document.getElementById('checkout-total').innerText = '₡' + total.toLocaleString();
+            
+            return { subtotal, shippingCost, total };
+        }
+
+        async function handleCheckout(event) {
+            event.preventDefault();
+            const loader = document.getElementById('global-loader');
+            loader.classList.add('active');
+
+            const cartItems = getCartItems();
+            if (cartItems.length === 0) {
+                alert("Tu carrito esta vacio.");
+                loader.classList.remove('active');
+                return;
+            }
+
+            const formData = new FormData(event.target);
+            const data = {
+                customer: {
+                    name: formData.get('name'),
+                    phone: formData.get('phone'),
+                    email: formData.get('email'),
+                    address: formData.get('address')
+                },
+                shippingMethod: formData.get('shipping'),
+                items: cartItems
+            };
+
+            try {
+                // Generate WhatsApp link directly (no server needed)
+                const shippingMethod = formData.get('shipping');
+                const shippingCost = shippingMethod === 'mensajeria' ? 3500 : 2500;
+                const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+                const total = subtotal + shippingCost;
+
+                let message = `*NUEVA ORDEN - The Beauty Spot*%0A%0A`;
+                message += `*Cliente:* ${formData.get('name')}%0A`;
+                message += `*Telefono:* ${formData.get('phone')}%0A`;
+                message += `*Email:* ${formData.get('email')}%0A`;
+                message += `*Direccion:* ${formData.get('address')}%0A`;
+                message += `*Envio:* ${shippingMethod === 'mensajeria' ? 'Mensajeria Privada' : 'Correos de CR'} (+${shippingCost})%0A%0A`;
+                message += `*Productos:%0A`;
+                cartItems.forEach(item => {
+                    message += `- ${item.name} x${item.quantity} = $${(item.price * item.quantity).toLocaleString()}%0A`;
+                });
+                message += `%0A*Total: $${total.toLocaleString()}*`;
+
+                const whatsappUrl = `https://wa.me/50688991234?text=${message}`;
+                
+                clearCart();
+                window.location.href = whatsappUrl;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+             renderCheckout();
+             
+             // Attach event listeners to avoid CSP inline handler issues
+             attachCartListeners('checkout-cart-container');
+             document.getElementById('checkout-form').addEventListener('submit', handleCheckout);
+             document.getElementById('shipping').addEventListener('change', updateCartTotal);
+        });
+    </script>
+    <!-- Instagram Section -->
+    <section class="instagram-section">
+        <div class="glass-panel instagram-content">
+            <h2 class="section-title">¡Visítanos en Instagram!</h2>
+            <p>Síguenos para estar al tanto de nuevos productos, promociones y más.</p>
+            <a href="https://www.instagram.com/thebeautyspot.cr/" target="_blank" class="instagram-cta">
+                <img src="assets/instagram-logo.png" alt="Instagram">
+                <span>@thebeautyspot.cr</span>
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; Derechos reservados The Beauty Spot 2026</p>
+        <p style="margin-top: 5px; font-size: 0.85em; opacity: 0.8;">Desarrollado por <a href="https://github.com/DesvoSoft" target="_blank" class="dev-link">DesvoSoft</a> <img src="assets/cr.png" alt="Costa Rica" style="width: 18px; vertical-align: middle; margin-left: 4px; border-radius: 2px;"></p>
+    </footer>
+</body>
+</html>
